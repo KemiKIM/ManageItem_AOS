@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "892109334421",
+    "firebase_url": "https://manageitem-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "manageitem",
+    "storage_bucket": "manageitem.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892109334421:android:2aa281987b5f1425b9b89c",
+        "android_client_info": {
+          "package_name": "com.seongho.manageitem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMQAmkJqjXDxKOfnFxc6wnEI4BHoWvq2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

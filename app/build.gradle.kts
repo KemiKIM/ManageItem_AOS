@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // Firebase
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -12,8 +15,8 @@ android {
         applicationId = "com.seongho.manageitem"
         minSdk = 31
         targetSdk = 36
-        versionCode = 10
-        versionName = "1.0.1"
+        versionCode = 10 // 이전 값 유지
+        versionName = "1.0.1" // 이전 값 유지
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,6 +44,14 @@ android {
 
 dependencies {
 
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
+    implementation("com.google.firebase:firebase-database")
+
+
+    // 기존 의존성
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
