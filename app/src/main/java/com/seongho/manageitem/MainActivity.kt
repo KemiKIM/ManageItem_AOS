@@ -4,63 +4,44 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.seongho.manageitem.ui.theme.ManageItemTheme
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.seongho.manageitem.features.entry.AuthScreen
+import com.seongho.manageitem.features.main.HomeScreen // 실제 패키지 경로에 맞게 수정
+import com.seongho.manageitem.features.main.MainTabsScreen
+import com.seongho.manageitem.navigation.NavigationDestinations
+import com.seongho.manageitem.ui.theme.ManageItemTheme // 자신의 테마로 변경
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ManageItemTheme {
-//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-//                }
-                layout(modifier = Modifier)
+            ManageItemTheme { // 자신의 앱 테마 적용
+                AppEntryNavigation()
             }
         }
     }
 }
 
 @Composable
-fun layout(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+fun AppEntryNavigation() {
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = NavigationDestinations.AUTH_SCREEN // 시작 화면
     ) {
-        Button(onClick = {
-            println("중앙 버튼 클릭됨!")
-        }) {
-            Text("화면 중앙 버튼")
+        composable(NavigationDestinations.AUTH_SCREEN) {
+            AuthScreen(navController = navController)
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ManageItemTheme {
-        Greeting("Android")
+        composable(NavigationDestinations.MAIN_TABS_SCREEN) {
+            MainTabsScreen(modifier = Modifier.fillMaxSize())
+            // 필요하다면 navController를 전달할 수 있음
+        }
+        // 여기에 나중에 MainTabsScreen과 그 내부 네비게이션이 추가될 것입니다.
     }
 }
