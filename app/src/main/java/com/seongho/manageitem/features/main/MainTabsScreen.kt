@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -25,6 +26,8 @@ import com.seongho.manageitem.features.main.HomeScreen // HomeScreen 임포트
 import com.seongho.manageitem.features.main.LocationScreen // SecondTabScreen 임포트
 import com.seongho.manageitem.features.main.SettingScreen // ThirdTabScreen 임포트
 import com.seongho.manageitem.navigation.NavigationDestinations // 경로 정의 임포트
+
+import com.seongho.manageitem.ui.theme.ManageItemTheme // 앱 테마 임포트 추가
 
 // 탭 정보를 담는 데이터 클래스 (이전에 정의했을 수 있음)
 data class BottomNavItem(
@@ -51,14 +54,15 @@ fun MainTabsScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            Column(modifier = Modifier.fillMaxWidth()
+            Column(modifier = Modifier
+                .fillMaxWidth()
                 .background(Color.Yellow)
             ) { // Column으로 묶어서 NavigationBar와 광고 영역 배치
                 // 1. 하단 네비게이션 바
                 NavigationBar(
                     modifier = Modifier
                         .fillMaxWidth() // 너비는 꽉 채우도록
-                        .height(56.dp)
+                        .height(100.dp)
                         .background(Color.Green)
                 ) {
                     val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
@@ -66,7 +70,12 @@ fun MainTabsScreen(
 
                     items.forEach { item ->
                         NavigationBarItem(
-                            icon = { Icon(item.icon, contentDescription = item.label) },
+                            icon = {
+                                Icon(
+                                    item.icon,
+                                    contentDescription = item.label
+                                )
+                            },
                             label = { Text(item.label) },
                             selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
@@ -116,5 +125,14 @@ fun MainTabsScreen(
                 SettingScreen()
             }
         }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun MainTabsScreenPreview() {
+    ManageItemTheme { // 앱의 테마로 감싸줍니다.
+        MainTabsScreen()
     }
 }
