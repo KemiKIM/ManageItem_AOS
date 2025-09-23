@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3") // ViewModel (상태 관리)
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // 기존 의존성
     implementation(libs.androidx.core.ktx)
