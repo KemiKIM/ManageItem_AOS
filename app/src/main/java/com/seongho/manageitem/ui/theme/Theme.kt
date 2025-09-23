@@ -11,6 +11,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
+import com.seongho.manageitem.ui.theme.*
+
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
@@ -35,18 +37,23 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun ManageItemTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
+    // darkTheme: Boolean = isSystemInDarkTheme(), // 이 줄을 AppTheme으로 대체
+    userSelectedTheme: AppTheme = AppTheme.SYSTEM, // 기본값을 SYSTEM으로 설정
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val darkThemeResolved = when (userSelectedTheme) {
+        AppTheme.LIGHT -> false
+        AppTheme.DARK -> true
+        AppTheme.SYSTEM -> isSystemInDarkTheme()
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkThemeResolved) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
-        darkTheme -> DarkColorScheme
+        darkThemeResolved -> DarkColorScheme
         else -> LightColorScheme
     }
 
