@@ -16,10 +16,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+import com.seongho.manageitem.navigation.NavigationDestinations
 import com.seongho.manageitem.features.entry.AuthScreen
 import com.seongho.manageitem.features.main.MainTabsScreen
-import com.seongho.manageitem.navigation.NavigationDestinations
+import com.seongho.manageitem.features.main.AddScreen
+
 import com.seongho.manageitem.ui.theme.*
+import com.seongho.manageitem.viewmodel.LocalItemVM
 import com.seongho.manageitem.viewmodel.SettingsVM
 
 
@@ -44,15 +47,29 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppEntryNavigation() {
     val navController = rememberNavController()
+    val localItemVM: LocalItemVM = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = NavigationDestinations.AUTH_SCREEN // 시작 화면
     ) {
         composable(NavigationDestinations.AUTH_SCREEN) {
-            AuthScreen(navController = navController)
+            AuthScreen(
+                navController = navController
+            )
         }
         composable(NavigationDestinations.MAIN_TABS_SCREEN) {
-            MainTabsScreen(modifier = Modifier.fillMaxSize())
+            MainTabsScreen(
+                mainNavController = navController,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        composable(NavigationDestinations.ADD_ITEM_SCREEN) {
+            // AddScreen에 navController와 itemViewModel 전달
+            AddScreen(
+                navController = navController,
+                itemViewModel = localItemVM
+            )
         }
     }
 }

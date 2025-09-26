@@ -37,6 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+import androidx.navigation.NavController // NavController import 추가
+import androidx.navigation.compose.rememberNavController // Preview를 위해 추가
+import com.seongho.manageitem.navigation.NavigationDestinations // NavigationDestinations import 추가
+
 import com.seongho.manageitem.ui.theme.*
 import com.seongho.manageitem.utils.ToastManager
 import com.seongho.manageitem.BuildConfig // 앱 버전을 가져오기 위해 필요
@@ -45,6 +49,7 @@ import com.seongho.manageitem.viewmodel.SettingsVM
 
 @Composable
 fun SettingScreen(
+    navController: NavController,
     modifier: Modifier = Modifier,
     settingsViewModel: SettingsVM = viewModel()
 ) {
@@ -197,7 +202,7 @@ fun SettingScreen(
                     title = "추가하기",
                     onClick = {
                         // 예시: 다른 화면으로 이동
-                        // navController?.navigate("your_destination_route")
+                         navController?.navigate(NavigationDestinations.ADD_ITEM_SCREEN)
                     }
                 )
             }
@@ -472,16 +477,6 @@ fun ExpandableSettingItem(
             Column { // 확장된 내용을 Column으로 감싸서 ColumnScope를 제공
                 expandedContent()
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingScreenPreview() {
-    ManageItemTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            SettingScreen()
         }
     }
 }

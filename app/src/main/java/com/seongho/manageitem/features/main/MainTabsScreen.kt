@@ -1,4 +1,4 @@
-package com.seongho.manageitem.features.main // 실제 패키지 경로에 맞게 수정
+package com.seongho.manageitem.features.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -39,7 +39,7 @@ data class BottomNavItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTabsScreen(
-    // mainNavController: NavHostController, // 전체 앱 네비게이션용 (필요하다면)
+    mainNavController: NavHostController, // 전체 앱 네비게이션용 (필요하다면)
     modifier: Modifier = Modifier
 ) {
     val tabNavController = rememberNavController() // 탭 내부 화면 전환용 NavController
@@ -56,7 +56,6 @@ fun MainTabsScreen(
         bottomBar = {
             Column(modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Yellow)
             ) { // Column으로 묶어서 NavigationBar와 광고 영역 배치
                 // 1. 하단 네비게이션 바
                 NavigationBar(
@@ -91,21 +90,6 @@ fun MainTabsScreen(
                     }
                 }
 
-                // 2. 광고 영역 (NavigationBar 바로 아래)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .background(Color.LightGray) // 광고가 로드되기 전까지 시각적으로 영역 표시 (선택 사항)
-                ) {
-                    // TODO: 여기에 실제 Google AdMob 배너 광고 Composable을 추가합니다.
-                    // 예: AdMobBanner()
-                    Text(
-                        text = "광고 영역 (80dp)",
-                        modifier = Modifier.align(Alignment.Center),
-                        textAlign = TextAlign.Center
-                    )
-                }
             }
         }
     ) { innerPadding ->
@@ -122,17 +106,8 @@ fun MainTabsScreen(
                 LocationScreen()
             }
             composable(NavigationDestinations.SETTING_SCREEN_TAB) {
-                SettingScreen()
+                SettingScreen(navController = mainNavController)
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun MainTabsScreenPreview() {
-    ManageItemTheme { // 앱의 테마로 감싸줍니다.
-        MainTabsScreen()
     }
 }
