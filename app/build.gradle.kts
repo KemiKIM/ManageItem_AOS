@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
+    alias(libs.plugins.ksp)
+
     // Firebase
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -60,6 +62,11 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3") // ViewModel (상태 관리)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Room 라이브러리 (toml에 정의된 별칭 사용)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler) // KSP용 컴파일러
+    implementation(libs.androidx.room.ktx)
 
     // 기존 의존성
     implementation(libs.androidx.core.ktx)
