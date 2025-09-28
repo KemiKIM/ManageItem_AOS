@@ -4,21 +4,18 @@ import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -26,14 +23,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.seongho.manageitem.features.main.HomeScreen // HomeScreen 임포트
-import com.seongho.manageitem.features.main.LocationScreen // SecondTabScreen 임포트
-import com.seongho.manageitem.features.main.SettingScreen // ThirdTabScreen 임포트
-import com.seongho.manageitem.navigation.NavigationDestinations // 경로 정의 임포트
+import androidx.navigation.navArgument // navArgument 임포트
 
-import com.seongho.manageitem.ui.theme.ManageItemTheme // 앱 테마 임포트 추가
+import com.seongho.manageitem.navigation.NavigationDestinations
+import com.seongho.manageitem.features.main.HomeScreen
+import com.seongho.manageitem.features.main.LocationScreen
+import com.seongho.manageitem.features.main.SettingScreen
+import com.seongho.manageitem.features.main.SearcherScreen
 
-// 탭 정보를 담는 데이터 클래스 (이전에 정의했을 수 있음)
+import com.seongho.manageitem.ui.theme.ManageItemTheme
+
 data class BottomNavItem(
     val label: String,
     val icon: ImageVector,
@@ -43,28 +42,24 @@ data class BottomNavItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTabsScreen(
-    mainNavController: NavHostController, // 전체 앱 네비게이션용 (필요하다면)
+    mainNavController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    // --- 상태 표시줄 아이콘 색상 조정 로직 ---
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
     if (window != null) {
         val isSurfaceLight = MaterialTheme.colorScheme.surface.luminance() > 0.5f
         DisposableEffect(isSurfaceLight, window) {
             val insetsController = WindowCompat.getInsetsController(window, view)
-            insetsController.isAppearanceLightStatusBars = isSurfaceLight // true면 아이콘 어둡게, false면 아이콘 밝게
-            onDispose {
-                // 특별히 이전 상태로 되돌릴 필요는 보통 없습니다.
-            }
+            insetsController.isAppearanceLightStatusBars = isSurfaceLight
+            onDispose {}
         }
     }
 
-    val tabNavController = rememberNavController() // 탭 내부 화면 전환용 NavController
+    val tabNavController = rememberNavController()
 
-    // 하단 탭 아이템 정의
     val items = listOf(
-        BottomNavItem("홈", Icons.Filled.Home, NavigationDestinations.HOME_SCREEN_TAB), // 경로 이름은 일관성 있게
+        BottomNavItem("홈", Icons.Filled.Home, NavigationDestinations.HOME_SCREEN_TAB),
         BottomNavItem("배치도", Icons.Filled.ShoppingCart, NavigationDestinations.LOCATION_SCREEN_TAB),
         BottomNavItem("설정", Icons.Filled.Settings, NavigationDestinations.SETTING_SCREEN_TAB)
     )
@@ -72,27 +67,19 @@ fun MainTabsScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-            ) { // Column으로 묶어서 NavigationBar와 광고 영역 배치
-                // 1. 하단 네비게이션 바
+            Column(modifier = Modifier.fillMaxWidth()) {
                 NavigationBar(
                     modifier = Modifier
-                        .fillMaxWidth() // 너비는 꽉 채우도록
+                        .fillMaxWidth()
                         .height(100.dp)
-                        .background(Color.Green)
+                        .background(Color.Green), // TODO: 테마 색상 사용 고려
                 ) {
                     val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
 
                     items.forEach { item ->
                         NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    item.icon,
-                                    contentDescription = item.label
-                                )
-                            },
+                            icon = { Icon(item.icon, contentDescription = item.label) },
                             label = { Text(item.label) },
                             selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
@@ -107,24 +94,38 @@ fun MainTabsScreen(
                         )
                     }
                 }
-
             }
         }
     ) { innerPadding ->
-        // 탭 내부 화면들을 보여줄 NavHost
         NavHost(
             navController = tabNavController,
-            startDestination = NavigationDestinations.HOME_SCREEN_TAB, // 탭의 기본 시작 화면
-            modifier = Modifier.padding(innerPadding) // Scaffold의 패딩 적용
+            startDestination = NavigationDestinations.HOME_SCREEN_TAB,
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable(NavigationDestinations.HOME_SCREEN_TAB) {
-                HomeScreen() // modifier를 전달할 필요가 있다면 HomeScreen에서 받도록 수정
+                // 1. HomeScreen에 tabNavController 전달
+                HomeScreen(navController = tabNavController)
             }
             composable(NavigationDestinations.LOCATION_SCREEN_TAB) {
                 LocationScreen()
             }
             composable(NavigationDestinations.SETTING_SCREEN_TAB) {
-                SettingScreen(navController = mainNavController)
+                SettingScreen(navController = mainNavController) // 설정 화면은 mainNavController 사용 유지
+            }
+
+            // 2. SearcherScreen 목적지 추가
+            composable(
+                route = NavigationDestinations.SEARCHER_SCREEN + "?initialQuery={initialQuery}",
+                arguments = listOf(navArgument("initialQuery") {
+                    type = androidx.navigation.NavType.StringType // 타입 명시
+                    nullable = true
+                    defaultValue = null
+                })
+            ) { backStackEntry ->
+                val initialQuery = backStackEntry.arguments?.getString("initialQuery")
+                // SearcherScreen 호출 시 필요한 모든 파라미터 전달
+                // itemViewModel은 SearcherScreen 내부에서 viewModel()로 가져오므로 여기서 전달 안 함
+                SearcherScreen(navController = tabNavController, initialQuery = initialQuery)
             }
         }
     }
