@@ -1,5 +1,6 @@
 package com.seongho.manageitem.features.main
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,10 +12,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -42,6 +46,20 @@ fun MainTabsScreen(
     mainNavController: NavHostController, // 전체 앱 네비게이션용 (필요하다면)
     modifier: Modifier = Modifier
 ) {
+    // --- 상태 표시줄 아이콘 색상 조정 로직 ---
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+    if (window != null) {
+        val isSurfaceLight = MaterialTheme.colorScheme.surface.luminance() > 0.5f
+        DisposableEffect(isSurfaceLight, window) {
+            val insetsController = WindowCompat.getInsetsController(window, view)
+            insetsController.isAppearanceLightStatusBars = isSurfaceLight // true면 아이콘 어둡게, false면 아이콘 밝게
+            onDispose {
+                // 특별히 이전 상태로 되돌릴 필요는 보통 없습니다.
+            }
+        }
+    }
+
     val tabNavController = rememberNavController() // 탭 내부 화면 전환용 NavController
 
     // 하단 탭 아이템 정의
