@@ -3,19 +3,29 @@ package com.seongho.manageitem.features.main
 import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons // 아이콘 사용을 위해 추가
+import androidx.compose.material.icons.automirrored.filled.ArrowBack // 뒤로가기 아이콘 (M3 권장)
+// import androidx.compose.material.icons.filled.ArrowBack // 만약 AutoMirrored가 없다면 이것을 사용
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 import androidx.navigation.NavController
 
 import com.seongho.manageitem.navigation.NavigationDestinations
+import com.seongho.manageitem.ui.theme.*
 import com.seongho.manageitem.viewmodel.LocalItemVM
 
 import com.seongho.manageitem.features.ad.InterstitialAdManager
@@ -36,53 +46,27 @@ fun AddScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("새 아이템 추가") })
-        },
-        bottomBar = {
-            Button(
-                onClick = {
-                    if (itemName.isNotBlank()) {
-                        itemViewModel.insertItem(
-                            name = itemName,
-                            location = itemLocation,
-                            partName = itemPartName,
-                            serialNumber = itemSerialNumber.ifBlank { null } // 비어있으면 null로
+            TopAppBar(
+                title = { Text("새 아이템 추가") },
+                navigationIcon = { // 네비게이션 아이콘 추가
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "뒤로 가기"
                         )
-
-
-                        // 전면광고 Open
-                        if (activity != null) {
-                            InterstitialAdManager.showAd(
-                                activity = activity,
-                                onAdDismissed = {
-
-                                    // HomeScreen으로 돌아가기 (이전 스택 제거 옵션 고려)
-                                    navController.navigate(NavigationDestinations.MAIN_TABS_SCREEN) {
-                                        popUpTo(NavigationDestinations.MAIN_TABS_SCREEN) {
-                                            inclusive = true // MAIN_TABS_SCREEN 포함 이전 스택 모두 제거
-                                        }
-                                        launchSingleTop =
-                                            true  // MAIN_TABS_SCREEN이 이미 스택에 있으면 재생성하지 않음
-                                    }
-                                }
-                            )
-                        }
-
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp, vertical = 8.dp)
-            ) {
-                Text("추가하기")
-            }
+                }
+                // 만약 TopAppBar의 colors를 여기서 직접 설정한다면,
+                // 위 isSurfaceLight 계산 시 해당 색상을 사용해야 합니다.
+            )
         }
-    ) {
-            paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(paddingValues)
+                .fillMaxSize()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -115,7 +99,42 @@ fun AddScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
+
+            Spacer(Modifier.weight(1f))
+
+            Button(
+                onClick = {
+                    if (itemName.isNotBlank()) {
+                        itemViewModel.insertItem(
+                            name = itemName,
+                            location = itemLocation,
+                            partName = itemPartName,
+                            serialNumber = itemSerialNumber.ifBlank { null }
+                        )
+
+                        if (activity != null) {
+                            InterstitialAdManager.showAd(
+                                activity = activity,
+                                onAdDismissed = {
+                                    navController.navigate(NavigationDestinations.MAIN_TABS_SCREEN) {
+                                        popUpTo(NavigationDestinations.MAIN_TABS_SCREEN) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MSignature,
+                    contentColor = Color.White
+                )
+            ) {
+                Text("추가하기")
+            }
         }
     }
-
 }
