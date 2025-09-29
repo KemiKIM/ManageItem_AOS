@@ -17,7 +17,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 import com.seongho.manageitem.navigation.NavigationDestinations
-import com.seongho.manageitem.features.entry.AuthScreen
 import com.seongho.manageitem.features.main.MainTabsScreen
 import com.seongho.manageitem.features.main.AddScreen
 
@@ -32,12 +31,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val settingsViewModel: SettingsVM = viewModel()
-
-            // ViewModel의 selectedAppTheme 상태 구독
             val userSelectedTheme by settingsViewModel.selectedAppTheme.collectAsState()
 
-
-            ManageItemTheme(userSelectedTheme = userSelectedTheme) { // 자신의 앱 테마 적용
+            // 앱 테마 적용
+            ManageItemTheme(userSelectedTheme = userSelectedTheme) {
                 AppEntryNavigation()
             }
         }
@@ -49,15 +46,12 @@ fun AppEntryNavigation() {
     val navController = rememberNavController()
     val localItemVM: LocalItemVM = viewModel()
 
+    val startDestination = NavigationDestinations.MAIN_TABS_SCREEN
+
     NavHost(
         navController = navController,
-        startDestination = NavigationDestinations.AUTH_SCREEN // 시작 화면
+        startDestination = startDestination // 시작 화면
     ) {
-        composable(NavigationDestinations.AUTH_SCREEN) {
-            AuthScreen(
-                navController = navController
-            )
-        }
         composable(NavigationDestinations.MAIN_TABS_SCREEN) {
             MainTabsScreen(
                 mainNavController = navController,
@@ -65,7 +59,6 @@ fun AppEntryNavigation() {
             )
         }
         composable(NavigationDestinations.ADD_ITEM_SCREEN) {
-            // AddScreen에 navController와 itemViewModel 전달
             AddScreen(
                 navController = navController,
                 itemViewModel = localItemVM

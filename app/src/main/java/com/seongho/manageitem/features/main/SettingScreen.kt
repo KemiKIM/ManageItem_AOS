@@ -1,5 +1,6 @@
 package com.seongho.manageitem.features.main
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,12 +12,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material.icons.sharp.*
+import androidx.compose.material.icons.filled.Dangerous
+import androidx.compose.material.icons.filled.HowToReg
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.outlined.*
 
 import androidx.compose.material3.*
@@ -24,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import androidx.compose.ui.Alignment
@@ -34,16 +38,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.KeyboardType
 
-import androidx.navigation.NavController // NavController import 추가
-import androidx.navigation.compose.rememberNavController // Preview를 위해 추가
-import com.seongho.manageitem.navigation.NavigationDestinations // NavigationDestinations import 추가
+import androidx.navigation.NavController
+import com.seongho.manageitem.navigation.NavigationDestinations
 
 import com.seongho.manageitem.ui.theme.*
 import com.seongho.manageitem.utils.ToastManager
-import com.seongho.manageitem.BuildConfig // 앱 버전을 가져오기 위해 필요
+import com.seongho.manageitem.BuildConfig
 import com.seongho.manageitem.viewmodel.SettingsVM
 
 
@@ -55,14 +58,79 @@ fun SettingScreen(
 ) {
     val context = LocalContext.current
 
-    // Auth
-    val authScreenEnabled by settingsViewModel.authScreenEnabled.collectAsState()
 
+
+    // AlertDialog 표시 상태
+    var showAuthDialog by remember { mutableStateOf(false) }
+    // TextField 입력 값 상태
+    var authInputText by remember { mutableStateOf("") }
+    var showRestartDialog by remember { mutableStateOf(false) }
+
+    val isAuthenticated by settingsViewModel.isUserAuthenticated.collectAsState()
 
     // Theme
     val modeSettingExpanded = settingsViewModel.modeSettingExpanded
     // StateFlow를 State로 변환하여 UI에 반영
     val selectedAppTheme by settingsViewModel.selectedAppTheme.collectAsState()
+
+
+
+
+    // --- AlertDialog 호출 ---
+    if (showAuthDialog) {
+        AuthAlertDialog(
+            authInputText = authInputText,
+            onAuthInputTextChange = { newValue ->
+                authInputText = newValue
+            },
+            onConfirmClicked = {
+                // "인증" 버튼 클릭 시 로직
+
+                // ViewModel을 통해 PIN 검증
+                val isPinValid = settingsViewModel.checkAuthPin(authInputText)
+                val currentInput = authInputText
+
+                showAuthDialog = false // 다이얼로그 닫기
+                authInputText = ""     // 입력값 초기화
+
+
+                if (isPinValid) {
+                    settingsViewModel.setUserAuthenticated()
+                    showRestartDialog = true
+                } else {
+                    ToastManager.showToast(context, "인증에 실패하였습니다.")
+                }
+
+
+
+            },
+            onDismissRequest = {
+                // 다이얼로그 닫기 요청 시 (외부 클릭, 뒤로가기, "닫기" 버튼)
+                showAuthDialog = false // 다이얼로그 닫기
+                authInputText = ""     // 입력값 초기화
+            }
+        )
+    }
+
+
+    // --- 앱 재시작 안내 AlertDialog 호출 ---
+    if (showRestartDialog) {
+        AppRestartConfirmDialog(
+            onConfirmRestart = {
+                showRestartDialog = false // 다이얼로그 상태 닫기
+
+                // 앱 재시작 로직
+                val packageManager = context.packageManager
+                val intent = packageManager.getLaunchIntentForPackage(context.packageName)
+                val componentName = intent!!.component
+                val mainIntent = Intent.makeRestartActivityTask(componentName)
+                context.startActivity(mainIntent)
+                (context as? Activity)?.finishAffinity()
+                Runtime.getRuntime().exit(0)
+            },
+            onDismissRequest = { }
+        )
+    }
 
 
     LazyColumn(
@@ -130,12 +198,23 @@ fun SettingScreen(
             SettingSection {
 
                 // 인증화면
-                ToggleSettingItem(
+                ClickableSettingItem(
                     icon = Icons.Outlined.LockPerson,
-                    title = "인증화면",
-                    checked = authScreenEnabled,
-                    onCheckedChange = { newState ->
-                        settingsViewModel.onAuthScreenToggled(newState)
+                    title = "인증",
+                    onClick = {
+                        if (!isAuthenticated) { // 인증되지 않았을 때만 다이얼로그 표시
+                            showAuthDialog = true
+                        } else {
+                            // 이미 인증된 경우, 원한다면 토스트 메시지 등을 표시할 수 있음
+                        }
+                    },
+                    trailingContent = { // 여기에 조건부 아이콘 추가
+                        Icon(
+                            imageVector = if (isAuthenticated) Icons.Filled.HowToReg else Icons.Filled.Dangerous,
+                            contentDescription = if (isAuthenticated) "인증됨" else "인증 안됨",
+                            modifier = Modifier.size(24.dp), // 아이콘 크기 조절 가능
+                            tint = if (isAuthenticated) MSignature else MaterialTheme.colorScheme.error // (선택) 아이콘 색상 변경
+                        )
                     }
                 )
 
@@ -341,7 +420,8 @@ fun SettingInfoItem(
 fun ClickableSettingItem(
     icon: ImageVector,
     title: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    trailingContent: (@Composable () -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -365,68 +445,22 @@ fun ClickableSettingItem(
             ),
             modifier = Modifier.weight(1f)
         )
-        Icon(
-            imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-            contentDescription = "Navigate",
-            modifier = Modifier
-                .size(18.dp)
-        )
-    }
-}
 
-
-
-
-// 토글 스위치가 있는 설정 아이템 (기존 코드 활용)
-@Composable
-fun ToggleSettingItem(
-    icon: ImageVector,
-    title: String,
-    checked: Boolean,  // 이 checked 값은 ViewModel로부터 collectAsState()로 온 값
-    onCheckedChange: (Boolean) -> Unit // 이 콜백은 ViewModel의 함수를 호출해야 합니다.
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
-            .padding(
-                horizontal = 16.dp,
-                vertical = 8.dp
-            ), // 토글은 높이가 조금 더 작을 수 있음
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = title,
-            modifier = Modifier
-                .size(24.dp),
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            modifier = Modifier.weight(1f)
-        )
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            modifier = Modifier.padding(start = 8.dp),
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = MSignature, // <<< 전역 색상 사용
-                checkedBorderColor = MSignature.copy(alpha = 0.7f),
-
-                uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
-                uncheckedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
+        //
+        if (trailingContent != null) {
+            trailingContent()
+        } else {
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                contentDescription = "Navigate", // 또는 null
+                modifier = Modifier.size(18.dp)
             )
-        )
+        }
     }
 }
+
+
+
 
 // 확장 가능한 설정 아이템 (예: 모드 설정)
 @Composable
@@ -479,4 +513,73 @@ fun ExpandableSettingItem(
             }
         }
     }
+}
+
+
+
+@Composable
+fun AuthAlertDialog(
+    authInputText: String,
+    onAuthInputTextChange: (String) -> Unit,
+    onConfirmClicked: () -> Unit,
+    onDismissRequest: () -> Unit // 다이얼로그 외부 클릭 또는 뒤로가기, "닫기" 버튼 공통 처리
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest, // 다이얼로그가 닫히도록 요청될 때 호출
+        title = { Text("인증") },
+        text = {
+            Column {
+                Text("아래에 입력하시오")
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = authInputText,
+                    onValueChange = { newValue ->
+                        // 숫자만 입력받도록 필터링
+                        if (newValue.all { it.isDigit() }) {
+                            onAuthInputTextChange(newValue)
+                        }
+                    },
+                    label = { Text("인증번호") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+        },
+        // "인증" 버튼 클릭 시 호출
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmClicked
+            ) {
+                Text("인증")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismissRequest
+            ) {
+                Text("닫기")
+            }
+        }
+    )
+}
+
+
+@Composable
+fun AppRestartConfirmDialog(
+    onConfirmRestart: () -> Unit, // "확인" 버튼 클릭 시 실행될 액션
+    onDismissRequest: () -> Unit // 다이얼로그 닫기 요청 (선택적 사용)
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest, // 외부 클릭이나 뒤로가기로 닫힐 때
+        title = { Text("인증 성공") },
+        text = { Text("인증에 성공하였습니다. 앱을 다시 시작합니다.") },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmRestart // 확인 버튼 클릭 시 앱 재시작 로직 실행
+            ) {
+                Text("확인")}
+        }
+        // 이 다이얼로그는 보통 '닫기' 버튼이 별도로 필요 없습니다.
+        // onDismissRequest를 통해 외부 클릭으로 닫거나, 확인 버튼으로만 닫히게 할 수 있습니다.
+    )
 }

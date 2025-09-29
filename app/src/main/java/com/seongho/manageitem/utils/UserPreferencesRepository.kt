@@ -1,19 +1,17 @@
 package com.seongho.manageitem.utils
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.core.booleanPreferencesKey
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-
-import java.io.IOException // map 연산자 내에서 예외 처리를 위해 추가 (선택적이지만 권장)
-import androidx.datastore.preferences.core.emptyPreferences // 초기값 또는 에러 시 사용
 
 import com.seongho.manageitem.ui.theme.*
 
@@ -24,10 +22,13 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 
 class UserPreferencesRepository(private val context: Context) {
 
+    private val AUTH_PIN = "12345"
+
     // 저장할 데이터의 키를 정의
     private object PreferencesKeys {
         val APP_THEME = stringPreferencesKey("app_theme")
-        val AUTH_SCREEN_ENABLED = booleanPreferencesKey("auth_screen_enabled") // 인증화면 키 추가
+        val AUTH_PIN = stringPreferencesKey("auth_pin")
+        val IS_USER_AUTHENTICATED = booleanPreferencesKey("is_user_authenticated")
     }
 
 
@@ -54,19 +55,28 @@ class UserPreferencesRepository(private val context: Context) {
         }
     }
 
-    // 2. AUTH_SCREEN_ENABLED : '인증화면 사용 여부'를 Flow로 읽어옴
-    val authScreenEnabled: Flow<Boolean> = context.dataStore.data
-        .map { preferences ->
-            // 키가 없으면 기본값으로 true를 반환 (인증화면 기본 활성화)
-            preferences[PreferencesKeys.AUTH_SCREEN_ENABLED] ?: true
-        }
 
-    // 2. AUTH_SCREEN_ENABLED : '인증화면 사용 여부'를 DataStore에 저장
-    suspend fun saveAuthScreenEnabled(isEnabled: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.AUTH_SCREEN_ENABLED] = isEnabled
-        }
+
+
+
+
+    fun isValidAuthPin(inputPin: String): Boolean {
+        return inputPin == AUTH_PIN
     }
 
 
+
+    // --- 사용자 인증 상태 읽기 ---
+    val isUserAuthenticated: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.IS_USER_AUTHENTICATED] ?: false // 기본값 false
+        }
+
+    // --- 사용자 인증 상태 저장 ---
+    suspend fun updateUserAuthenticationState(isAuthenticated: Boolean) {
+        Log.d("UserPreferencesRepo", "Updating IS_USER_AUTHENTICATED to: $isAuthenticated")
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.IS_USER_AUTHENTICATED] = isAuthenticated
+        }
+    }
 }

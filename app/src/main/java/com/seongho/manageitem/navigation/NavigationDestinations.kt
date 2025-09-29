@@ -1,9 +1,6 @@
 package com.seongho.manageitem.navigation
 
 object NavigationDestinations {
-    const val AUTH_SCREEN = "auth_screen"
-
-
     const val MAIN_TABS_SCREEN = "main_tabs_screen"
 
     const val HOME_SCREEN_TAB = "home_screen_tab"
