@@ -18,14 +18,19 @@ android {
         applicationId = "com.seongho.manageitem"
         minSdk = 31
         targetSdk = 36
-        versionCode = 10 // 이전 값 유지
-        versionName = "1.0.1" // 이전 값 유지
+        versionCode = 11
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        debug {
+            // Sample ID
+            manifestPlaceholders["ADMOB_APP_ID"] = "ca-app-pub-3940256099942544~3347511713"
+        }
         release {
+            manifestPlaceholders["ADMOB_APP_ID"] = "ca-app-pub-2175540706262416~5480561653"
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -58,13 +63,16 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
 
     implementation("androidx.navigation:navigation-compose:2.7.7") // Navigation Compose
-    implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3") // ViewModel (상태 관리)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
+    // Google AdMob
+    implementation("com.google.android.gms:play-services-ads:24.6.0")
+
     // Room 라이브러리 (toml에 정의된 별칭 사용)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.material3)
     ksp(libs.androidx.room.compiler) // KSP용 컴파일러
     implementation(libs.androidx.room.ktx)
 

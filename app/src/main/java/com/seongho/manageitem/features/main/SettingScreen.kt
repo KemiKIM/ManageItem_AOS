@@ -176,7 +176,7 @@ fun SettingScreen(
 
                 // 문의하기
                 ClickableSettingItem(
-                    icon = Icons.Outlined.ArrowCircleUp,
+                    icon = Icons.Outlined.AlternateEmail,
                     title = "문의하기",
                     onClick = {
                         sendEmail(
@@ -198,25 +198,25 @@ fun SettingScreen(
             SettingSection {
 
                 // 인증화면
-                ClickableSettingItem(
-                    icon = Icons.Outlined.LockPerson,
-                    title = "인증",
-                    onClick = {
-                        if (!isAuthenticated) { // 인증되지 않았을 때만 다이얼로그 표시
-                            showAuthDialog = true
-                        } else {
-                            // 이미 인증된 경우, 원한다면 토스트 메시지 등을 표시할 수 있음
-                        }
-                    },
-                    trailingContent = { // 여기에 조건부 아이콘 추가
-                        Icon(
-                            imageVector = if (isAuthenticated) Icons.Filled.HowToReg else Icons.Filled.Dangerous,
-                            contentDescription = if (isAuthenticated) "인증됨" else "인증 안됨",
-                            modifier = Modifier.size(24.dp), // 아이콘 크기 조절 가능
-                            tint = if (isAuthenticated) MSignature else MaterialTheme.colorScheme.error // (선택) 아이콘 색상 변경
-                        )
-                    }
-                )
+//                ClickableSettingItem(
+//                    icon = Icons.Outlined.LockPerson,
+//                    title = "인증",
+//                    onClick = {
+//                        if (!isAuthenticated) { // 인증되지 않았을 때만 다이얼로그 표시
+//                            showAuthDialog = true
+//                        } else {
+//                            // 이미 인증된 경우, 원한다면 토스트 메시지 등을 표시할 수 있음
+//                        }
+//                    },
+//                    trailingContent = { // 여기에 조건부 아이콘 추가
+//                        Icon(
+//                            imageVector = if (isAuthenticated) Icons.Filled.HowToReg else Icons.Filled.Dangerous,
+//                            contentDescription = if (isAuthenticated) "인증됨" else "인증 안됨",
+//                            modifier = Modifier.size(24.dp), // 아이콘 크기 조절 가능
+//                            tint = if (isAuthenticated) MSignature else MaterialTheme.colorScheme.error // (선택) 아이콘 색상 변경
+//                        )
+//                    }
+//                )
 
 
                 HorizontalDivider(

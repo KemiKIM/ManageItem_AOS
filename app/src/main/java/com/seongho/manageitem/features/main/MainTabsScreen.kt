@@ -1,19 +1,23 @@
 package com.seongho.manageitem.features.main
 
 import android.app.Activity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.*
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import androidx.core.view.WindowCompat
 
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -23,7 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument // navArgument 임포트
+import androidx.navigation.navArgument
 
 import com.seongho.manageitem.navigation.NavigationDestinations
 import com.seongho.manageitem.features.main.HomeScreen
@@ -31,7 +35,7 @@ import com.seongho.manageitem.features.main.LocationScreen
 import com.seongho.manageitem.features.main.SettingScreen
 import com.seongho.manageitem.features.main.SearcherScreen
 
-import com.seongho.manageitem.ui.theme.ManageItemTheme
+import com.seongho.manageitem.ui.theme.*
 
 data class BottomNavItem(
     val label: String,
@@ -57,30 +61,61 @@ fun MainTabsScreen(
     }
 
     val tabNavController = rememberNavController()
+    val isEffectivelyDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
 
     val items = listOf(
         BottomNavItem("홈", Icons.Filled.Home, NavigationDestinations.HOME_SCREEN_TAB),
-        BottomNavItem("배치도", Icons.Filled.ShoppingCart, NavigationDestinations.LOCATION_SCREEN_TAB),
-        BottomNavItem("설정", Icons.Filled.Settings, NavigationDestinations.SETTING_SCREEN_TAB)
+//        BottomNavItem("배치도", Icons.Default.TurnSharpRight, NavigationDestinations.LOCATION_SCREEN_TAB),
+        BottomNavItem("설정", Icons.Filled.SettingsSuggest, NavigationDestinations.SETTING_SCREEN_TAB)
     )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+
                 NavigationBar(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                        .background(Color.Green), // TODO: 테마 색상 사용 고려
+                        .padding(horizontal = 24.dp, vertical = 24.dp)
+                        .height(80.dp)
+                        .shadow(
+                            elevation = if (isEffectivelyDarkTheme) 8.dp else 6.dp, // 다크 모드에서 elevation 증가
+                            shape = RoundedCornerShape(30.dp)
+                        )
+                        .clip(RoundedCornerShape(30.dp)),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    tonalElevation = 0.dp
                 ) {
                     val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
 
+
                     items.forEach { item ->
+                        val isSelected =
+                            currentDestination?.hierarchy?.any { it.route == item.route } == true
+
                         NavigationBarItem(
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) },
+                            icon = {
+                                Box(
+                                    modifier = Modifier.padding(top = 25.dp)
+                                ) {
+                                    Icon(
+                                        item.icon,
+                                        contentDescription = item.label,
+                                        modifier = Modifier.size(30.dp)
+
+                                    )
+                                }
+
+                            },
+                            label = {
+                                if (isSelected) {
+                                    Text(
+                                        item.label,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            },
                             selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
                                 tabNavController.navigate(item.route) {
@@ -90,11 +125,18 @@ fun MainTabsScreen(
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MSignature,
+                                selectedTextColor = MSignature,
+                                unselectedIconColor = if (isEffectivelyDarkTheme) Color.White else Color.Black,
+                                unselectedTextColor = if (isEffectivelyDarkTheme) Color.White else Color.Black,
+                                indicatorColor = Transparent // 선택 표시기 배경색 (투명하게 하거나 surfaceVariant와 동일하게 할 수도 있음)
+                            )
                         )
                     }
                 }
-            }
+
         }
     ) { innerPadding ->
         NavHost(

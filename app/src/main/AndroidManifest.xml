@@ -10,7 +10,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ManageItem">
+        android:theme="@style/Theme.ManageItem"
+        android:hardwareAccelerated="true">
+
         <activity
             android:name=".LauncherActivity"
             android:exported="true"
@@ -30,6 +32,11 @@
             android:theme="@style/Theme.ManageItem">
         </activity>
 
+        <!-- Google Admob -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${ADMOB_APP_ID}"/>
+
     </application>
 
     <queries>
@@ -38,5 +45,7 @@
             <data android:scheme="mailto" />
         </intent>
     </queries>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

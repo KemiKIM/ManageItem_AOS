@@ -21,6 +21,7 @@ import androidx.core.view.WindowCompat
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 
 import androidx.navigation.NavController
 
@@ -28,7 +29,9 @@ import com.seongho.manageitem.navigation.NavigationDestinations
 import com.seongho.manageitem.ui.theme.*
 import com.seongho.manageitem.viewmodel.LocalItemVM
 
-import com.seongho.manageitem.features.ad.InterstitialAdManager
+import androidx.compose.runtime.LaunchedEffect // LaunchedEffect 추가
+import com.seongho.manageitem.features.ad.GoogleADManager
+import com.seongho.manageitem.utils.ToastManager
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,12 +45,20 @@ fun AddScreen(
     var itemPartName by remember { mutableStateOf("") }
     var itemSerialNumber by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
     val activity = LocalContext.current as? Activity
 
+    ToastManager.showToast(context, "광고 시청 후 물품을 추가하실 수 있습니다.")
+
+    LaunchedEffect(Unit) {
+        if (activity != null) { // activity가 null이 아닐 때만 광고 로드
+            GoogleADManager.loadInterstitialAd(activity.applicationContext)
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("새 아이템 추가") },
+                title = { Text("새 물품 추가") },
                 navigationIcon = { // 네비게이션 아이콘 추가
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -74,7 +85,7 @@ fun AddScreen(
             OutlinedTextField(
                 value = itemName,
                 onValueChange = { itemName = it },
-                label = { Text("아이템 이름 (필수)") },
+                label = { Text("물품 이름") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -105,17 +116,21 @@ fun AddScreen(
             Button(
                 onClick = {
                     if (itemName.isNotBlank()) {
-                        itemViewModel.insertItem(
-                            name = itemName,
-                            location = itemLocation,
-                            partName = itemPartName,
-                            serialNumber = itemSerialNumber.ifBlank { null }
-                        )
 
                         if (activity != null) {
-                            InterstitialAdManager.showAd(
+                            GoogleADManager.showInterstitialAd(
                                 activity = activity,
                                 onAdDismissed = {
+
+                                    itemViewModel.insertItem(
+                                        name = itemName,
+                                        location = itemLocation,
+                                        partName = itemPartName,
+                                        serialNumber = itemSerialNumber.ifBlank { null }
+                                    )
+
+                                    ToastManager.showToast(context, "추가 완료.")
+
                                     navController.navigate(NavigationDestinations.MAIN_TABS_SCREEN) {
                                         popUpTo(NavigationDestinations.MAIN_TABS_SCREEN) {
                                             inclusive = true

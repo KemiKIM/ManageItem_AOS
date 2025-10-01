@@ -19,6 +19,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 import androidx.navigation.NavController
+import com.seongho.manageitem.utils.ToastManager
 import com.seongho.manageitem.navigation.NavigationDestinations
 
 
@@ -43,7 +44,7 @@ fun HomeScreen(
             onValueChange = { searchQuery = it },
             modifier = Modifier
                 .fillMaxWidth(),
-            placeholder = { Text("아이템 검색") },
+            placeholder = { Text("물품 검색") },
             leadingIcon = {
                 Icon(Icons.Filled.Search, contentDescription = "검색 아이콘")
             },

@@ -139,18 +139,18 @@ fun SearcherScreen(
                 }
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        selectedItem?.id?.let { itemId ->
-                            navController.navigate(NavigationDestinations.ADD_ITEM_SCREEN + "/$itemId")
-                        }
-                        showDetailDialog = false
-                        selectedItem = null
-                        showDeleteConfirmDialog = false
-                    }
-                ) {
-                    Text("편집")
-                }
+//                TextButton(
+//                    onClick = {
+//                        selectedItem?.id?.let { itemId ->
+//                            navController.navigate(NavigationDestinations.ADD_ITEM_SCREEN + "/$itemId")
+//                        }
+//                        showDetailDialog = false
+//                        selectedItem = null
+//                        showDeleteConfirmDialog = false
+//                    }
+//                ) {
+//                    Text("편집")
+//                }
             },
             dismissButton = {
                 TextButton(
