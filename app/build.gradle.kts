@@ -18,7 +18,7 @@ android {
         applicationId = "com.seongho.manageitem"
         minSdk = 31
         targetSdk = 36
-        versionCode = 11
+        versionCode = 12
         versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -27,9 +27,11 @@ android {
     buildTypes {
         debug {
             // Sample ID
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
             manifestPlaceholders["ADMOB_APP_ID"] = "ca-app-pub-3940256099942544~3347511713"
         }
         release {
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-2175540706262416/6161914477\"")
             manifestPlaceholders["ADMOB_APP_ID"] = "ca-app-pub-2175540706262416~5480561653"
             isMinifyEnabled = false
             proguardFiles(

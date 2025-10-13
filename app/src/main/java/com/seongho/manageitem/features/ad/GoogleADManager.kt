@@ -12,12 +12,13 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import java.util.concurrent.TimeUnit
 
+import com.seongho.manageitem.BuildConfig
+
 object GoogleADManager {
 
     private const val TAG = "GoogleADManager"
 
-    // 실제 운영 시에는 본인의 광고 단위 ID로 교체하세요.
-    private const val INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712" // 테스트 ID
+    private val INTERSTITIAL_AD_UNIT_ID = BuildConfig.ADMOB_INTERSTITIAL_AD_UNIT_ID
 
     private var mInterstitialAd: InterstitialAd? = null
     private var isAdLoading: Boolean = false
