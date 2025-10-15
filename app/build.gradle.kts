@@ -18,10 +18,14 @@ android {
         applicationId = "com.seongho.manageitem"
         minSdk = 31
         targetSdk = 36
-        versionCode = 12
-        versionName = "1.0.1"
+        versionCode = 17
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -75,8 +79,18 @@ dependencies {
     // Room 라이브러리 (toml에 정의된 별칭 사용)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui)
+    implementation(libs.inputmapping)
     ksp(libs.androidx.room.compiler) // KSP용 컴파일러
     implementation(libs.androidx.room.ktx)
+
+    // In-App Update API
+    implementation("com.google.android.play:app-update:2.1.0")
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
+
+    //
+    implementation("androidx.fragment:fragment-ktx:1.6.0")
+    implementation("androidx.activity:activity-ktx:1.7.2")
 
     // 기존 의존성
     implementation(libs.androidx.core.ktx)
