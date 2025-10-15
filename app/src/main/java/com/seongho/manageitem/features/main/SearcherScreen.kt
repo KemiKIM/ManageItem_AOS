@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.seongho.manageitem.data.local.entity.ItemEntity
 import com.seongho.manageitem.navigation.NavigationDestinations // 네비게이션 경로 상수
 import com.seongho.manageitem.viewmodel.LocalItemVM
+import com.seongho.manageitem.viewmodel.MainVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +32,7 @@ fun SearcherScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     itemViewModel: LocalItemVM = viewModel(),
+    mainVM: MainVM,
     initialQuery: String? = null
 ) {
     // searchQuery 상태를 rememberSaveable로 변경
@@ -40,6 +42,9 @@ fun SearcherScreen(
     var showDetailDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<ItemEntity?>(null) }
+
+    // MainVM에서 인증 상태를 구독
+    val isAuthenticated by mainVM.isUserAuthenticated.collectAsState()
 
     val filteredItems = remember(searchQuery, allItems) {
         if (searchQuery.isBlank()) {
@@ -91,7 +96,7 @@ fun SearcherScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (allItems.isEmpty()) {
-                    Text("아이템이 없습니다. '추가' 탭에서 새 아이템을 등록하세요.")
+                    Text("등록된 물품이 없습니다.")
                 } else {
                     Text("검색 결과가 없습니다.")
                 }
@@ -153,12 +158,14 @@ fun SearcherScreen(
 //                }
             },
             dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteConfirmDialog = true
+                if (!isAuthenticated) {
+                    TextButton(
+                        onClick = {
+                            showDeleteConfirmDialog = true
+                        }
+                    ) {
+                        Text("삭제")
                     }
-                ) {
-                    Text("삭제")
                 }
             }
         )
