@@ -3,9 +3,8 @@ package com.seongho.manageitem.features.main
 import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons // 아이콘 사용을 위해 추가
-import androidx.compose.material.icons.automirrored.filled.ArrowBack // 뒤로가기 아이콘 (M3 권장)
-// import androidx.compose.material.icons.filled.ArrowBack // 만약 AutoMirrored가 없다면 이것을 사용
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -13,11 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,9 +25,10 @@ import com.seongho.manageitem.navigation.NavigationDestinations
 import com.seongho.manageitem.ui.theme.*
 import com.seongho.manageitem.viewmodel.LocalItemVM
 
-import androidx.compose.runtime.LaunchedEffect // LaunchedEffect 추가
+import androidx.compose.runtime.LaunchedEffect
 import com.seongho.manageitem.features.ad.GoogleADManager
 import com.seongho.manageitem.utils.ToastManager
+import com.seongho.manageitem.utils.NetworkUtils
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,6 +113,11 @@ fun AddScreen(
             Button(
                 onClick = {
                     if (itemName.isNotBlank()) {
+
+                        if (!NetworkUtils.isNetworkAvailable(context)) {
+                            ToastManager.showToast(context, "인터넷 연결을 확인해주세요.")
+                            return@Button
+                        }
 
                         if (activity != null) {
                             GoogleADManager.showInterstitialAd(
