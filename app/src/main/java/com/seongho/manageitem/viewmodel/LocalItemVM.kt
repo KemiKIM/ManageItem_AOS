@@ -80,4 +80,14 @@ class LocalItemVM(application: Application) : AndroidViewModel(application) {
             itemDao.deleteAllItems()
         }
     }
+
+    /**
+     * 기존의 모든 아이템을 삭제하고 새로운 목록으로 교체합니다.
+     * @param items Firebase에서 가져온 새로운 아이템 목록
+     */
+    fun replaceAllItems(items: List<ItemEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            itemDao.replaceAll(items)
+        }
+    }
 }
