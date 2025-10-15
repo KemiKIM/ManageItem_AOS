@@ -61,4 +61,14 @@ interface ItemDao {
      */
     @Query("DELETE FROM items")
     suspend fun deleteAllItems()
+
+    /**
+     * 데이터베이스의 모든 아이템을 삭제하고 새로운 목록으로 교체합니다.
+     * 이 작업은 하나의 트랜잭션으로 처리되어 데이터 정합성을 보장합니다.* @param items 새로 삽입할 아이템 목록
+     */
+    @Transaction
+    suspend fun replaceAll(items: List<ItemEntity>) {
+        deleteAllItems()
+        insertItems(items)
+    }
 }
