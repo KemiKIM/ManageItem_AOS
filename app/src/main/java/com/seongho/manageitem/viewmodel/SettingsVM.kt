@@ -31,15 +31,6 @@ class SettingsVM(application: Application) : AndroidViewModel(application) {
     var modeSettingExpanded by mutableStateOf(false)
         private set
 
-    // --- 사용자 인증 상태 --- (이 부분이 추가/확인되어야 합니다)
-    val isUserAuthenticated: StateFlow<Boolean> = userPreferencesRepository.isUserAuthenticated
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000), // Flow 구독 관리
-            initialValue = false // DataStore에서 값을 불러오기 전 또는 값이 없을 때의 기본값
-        )
-
-
     // Screen White/Dark
     fun onModeSettingExpanded(isExpanded: Boolean) {
         modeSettingExpanded = isExpanded
@@ -50,16 +41,4 @@ class SettingsVM(application: Application) : AndroidViewModel(application) {
             userPreferencesRepository.saveAppTheme(theme)
         }
     }
-
-
-    fun checkAuthPin(inputPin: String): Boolean {
-        return userPreferencesRepository.isValidAuthPin(inputPin)
-    }
-
-    fun setUserAuthenticated() {
-        viewModelScope.launch {
-            userPreferencesRepository.updateUserAuthenticationState(true)
-        }
-    }
-
 }
