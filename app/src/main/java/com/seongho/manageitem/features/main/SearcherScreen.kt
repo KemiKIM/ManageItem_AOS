@@ -234,7 +234,8 @@ fun ItemRow(
             Text(
                 text = item.location ?: "-",
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                fontSize = 14.sp
             )
         }
 
