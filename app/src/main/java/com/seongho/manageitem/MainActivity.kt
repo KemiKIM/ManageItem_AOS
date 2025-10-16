@@ -10,16 +10,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.seongho.manageitem.features.main.AddScreen
 import com.seongho.manageitem.features.main.MainTabsScreen
 import com.seongho.manageitem.navigation.NavigationDestinations
 import com.seongho.manageitem.ui.theme.*
+
 import com.seongho.manageitem.viewmodel.LocalItemVM
 import com.seongho.manageitem.viewmodel.MainVM
 import com.seongho.manageitem.viewmodel.SettingsVM
+
+import com.seongho.manageitem.features.main.LocationViewScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +75,18 @@ fun AppEntryNavigation(
             AddScreen(
                 navController = navController,
                 itemViewModel = localItemVM
+            )
+        }
+        composable(
+            route = "${NavigationDestinations.LOCATION_VIEW_SCREEN}/{locationName}",
+            arguments = listOf(navArgument("locationName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            // 전달받은 locationName을 추출
+            val locationName = backStackEntry.arguments?.getString("locationName")
+
+            LocationViewScreen(
+                locationName = locationName,
+                navController = navController
             )
         }
     }

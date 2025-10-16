@@ -7,6 +7,7 @@ object NavigationDestinations {
     const val SEARCHER_SCREEN = "searcher_screen"
 
     const val LOCATION_SCREEN_TAB = "location_screen_tab"
+    const val LOCATION_VIEW_SCREEN = "location_view_screen"
 
     const val SETTING_SCREEN_TAB = "setting_screen_tab"
     const val ADD_ITEM_SCREEN = "add_item_screen"
