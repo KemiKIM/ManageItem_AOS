@@ -18,7 +18,7 @@ android {
         applicationId = "com.seongho.manageitem"
         minSdk = 31
         targetSdk = 36
-        versionCode = 17
+        versionCode = 20
         versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
