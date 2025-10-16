@@ -1,9 +1,11 @@
 package com.seongho.manageitem.features.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,16 +50,18 @@ fun SearcherScreen(
     val isAuthenticated by mainVM.isUserAuthenticated.collectAsState()
 
     val filteredItems = remember(searchQuery, allItems) {
-        if (searchQuery.isBlank()) {
+        val results = if (searchQuery.isBlank()) {
             allItems
         } else {
             allItems.filter { item ->
                 (item.name?.contains(searchQuery, ignoreCase = true) ?: false) ||
-                (item.partName?.contains(searchQuery, ignoreCase = true) ?: false) ||
-                (item.location?.contains(searchQuery, ignoreCase = true) ?: false) ||
-                (item.serialNumber?.contains(searchQuery, ignoreCase = true) ?: false)
+                        (item.partName?.contains(searchQuery, ignoreCase = true) ?: false) ||
+                        (item.location?.contains(searchQuery, ignoreCase = true) ?: false) ||
+                        (item.serialNumber?.contains(searchQuery, ignoreCase = true) ?: false)
             }
         }
+        // 필터링된 결과에 대해 location을 기준으로 오름차순 정렬 적용
+        results.sortedBy() { it.location }
     }
 
     Column(
@@ -72,7 +77,7 @@ fun SearcherScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
-            placeholder = { Text("아이템 검색") },
+            placeholder = { Text("물품 검색") },
             leadingIcon = {
                 Icon(Icons.Filled.Search, contentDescription = "검색 아이콘")
             },
@@ -215,16 +220,52 @@ fun ItemRow(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onItemClick(item) }
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 12.dp, horizontal = 8.dp), // 셀의 상하, 좌우 여백 추가
+        verticalAlignment = Alignment.CenterVertically // 내용물을 세로 중앙 정렬
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = item.name ?: "-", style = MaterialTheme.typography.titleMedium)
-            Text(text = "부품명: ${item.partName ?: "-"}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "위치: ${item.location ?: "-"}", style = MaterialTheme.typography.bodySmall)
-            item.serialNumber?.let {
-                Text(text = "S/N: $it", style = MaterialTheme.typography.bodySmall)
-            }
+        // 왼쪽: 위치를 표시하는 박스
+        Box(
+            modifier = Modifier
+                .size(72.dp) // 박스 크기
+                .clip(RoundedCornerShape(12.dp)) // 모서리를 둥글게
+                .background(MaterialTheme.colorScheme.secondaryContainer), // 배경색
+            contentAlignment = Alignment.Center // 내용물을 중앙에 배치
+        ) {
+            Text(
+                text = item.location ?: "-",
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+
+        // 박스와 텍스트 사이의 간격
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // 오른쪽: 이름, 부품명, S/N을 표시하는 컬럼
+        Column(
+            modifier = Modifier.weight(1f), // 남은 공간을 모두 차지
+            verticalArrangement = Arrangement.spacedBy(4.dp) // 텍스트 간의 세로 간격
+        ) {
+            // 이름 (굵고 크게)
+            Text(
+                text = item.name ?: "-",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            // 부품명
+            Text(
+                text = item.partName ?: "-",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            // 시리얼 넘버
+            Text(
+                text = item.serialNumber ?: "-",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
