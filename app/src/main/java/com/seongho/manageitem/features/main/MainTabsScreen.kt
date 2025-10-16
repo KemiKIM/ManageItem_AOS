@@ -67,14 +67,14 @@ fun MainTabsScreen(
 
     val items = if (isAuthenticated) {
         listOf(
-            BottomNavItem("홈", iconResId = R.drawable.ic_other_house, NavigationDestinations.HOME_SCREEN_TAB),
-            BottomNavItem("배치도", iconResId = R.drawable.ic_auto_transmission, NavigationDestinations.LOCATION_SCREEN_TAB),
-            BottomNavItem("설정", iconResId = R.drawable.ic_gear, NavigationDestinations.SETTING_SCREEN_TAB)
+            BottomNavItem("홈", iconResId = R.drawable.home_other_house, NavigationDestinations.HOME_SCREEN_TAB),
+            BottomNavItem("배치도", iconResId = R.drawable.home_auto_transmission, NavigationDestinations.LOCATION_SCREEN_TAB),
+            BottomNavItem("설정", iconResId = R.drawable.home_gear, NavigationDestinations.SETTING_SCREEN_TAB)
         )
     } else {
         listOf(
-            BottomNavItem("홈", iconResId = R.drawable.ic_other_house, NavigationDestinations.HOME_SCREEN_TAB),
-            BottomNavItem("설정", iconResId = R.drawable.ic_gear, NavigationDestinations.SETTING_SCREEN_TAB)
+            BottomNavItem("홈", iconResId = R.drawable.home_other_house, NavigationDestinations.HOME_SCREEN_TAB),
+            BottomNavItem("설정", iconResId = R.drawable.home_gear, NavigationDestinations.SETTING_SCREEN_TAB)
         )
     }
 
@@ -148,7 +148,7 @@ fun MainTabsScreen(
                 )
             }
             composable(NavigationDestinations.LOCATION_SCREEN_TAB) {
-                LocationScreen()
+                LocationScreen(navController = mainNavController)
             }
             composable(NavigationDestinations.SETTING_SCREEN_TAB) {
                 SettingsScreen(
